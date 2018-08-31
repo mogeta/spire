@@ -1,4 +1,4 @@
-package spire_io
+package spire
 
 import (
 	"net/url"
