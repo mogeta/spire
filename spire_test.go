@@ -5,6 +5,7 @@ import (
 	"os"
 	"github.com/spf13/viper"
 	"fmt"
+	"time"
 )
 
 func getConfig(filename string){
@@ -28,5 +29,10 @@ func TestMain(m *testing.M) {
 func Test(t *testing.T) {
 
 	accessToken := viper.GetString("access_token")
-	spire_io.NewClient(accessToken)
+	client := NewClient(accessToken)
+	spires := client.fetch(WithTime(time.Date(2018,8,30,0,0,0,0,time.UTC)))
+	for key, value := range *spires {
+		fmt.Println(key)
+		fmt.Println(value)
+	}
 }

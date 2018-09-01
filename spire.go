@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"fmt"
 	"io/ioutil"
+	"time"
 	"encoding/json"
 )
+
+const URL = "https://app.spire.io/api/v2/streaks?"
 
 type Client struct {
 	accessToken string
 }
-
 
 type Spires []*SpireData
 
@@ -27,6 +29,11 @@ type SpireData struct {
 	Modified     bool    `json:"modified"`
 }
 
+type Query struct {
+	date string
+}
+
+type queryOption func(*Query)
 
 func NewClient(accessToken string) Client {
 
@@ -35,32 +42,40 @@ func NewClient(accessToken string) Client {
 	}
 }
 
-func (c Client)fetchData(date string)[]byte{
+func WithTime(t time.Time) queryOption {
+	return func(q *Query) {
+		q.date =  t.Format("20060102")
+	}
+}
+
+func (c Client)fetch(opt ...queryOption) *Spires{
+	query := Query{}
+	for _, o := range opt {
+		o(&query)
+	}
+
 	values := url.Values{}
 	values.Add("access_token", c.accessToken)
-	values.Add("date",date)
 
-	resp, err := http.Get("https://app.spire.io/api/v2/streaks" + "?" + values.Encode())
+	if query.date != "" {
+		values.Add("date",query.date)
+	}
+
+	resp, err := http.Get(URL + values.Encode())
 	if err != nil {
 		fmt.Println(err)
-		return nil
+
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
-	//println(string(body))
-	return body
-}
-
-func (c Client)fetch(data []byte){
 	spireData := new(Spires)
-	err := json.Unmarshal(data,spireData)
+	err = json.Unmarshal(body,spireData)
 	if err != nil {
 		fmt.Errorf("%s",err)
 	}
 
-	for key, value := range *spireData {
-		fmt.Println(key)
-		fmt.Println(value)
-	}
+	return spireData
 }
+
+
