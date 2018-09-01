@@ -17,6 +17,7 @@ type Client struct {
 
 type Spires []*SpireData
 
+
 type SpireData struct {
 	Type         string  `json:"type"`
 	StartAt      int     `json:"start_at"`
@@ -28,6 +29,19 @@ type SpireData struct {
 	ModifiedType string  `json:"modified_type"`
 	Modified     bool    `json:"modified"`
 }
+
+type TotalStreaks struct{
+	calm int
+	focus int
+	tense int
+	activity int
+	sedentary int
+	disconnected int
+	charging int
+	notworn int
+	neutral int
+}
+
 
 type Query struct {
 	date string
@@ -78,4 +92,29 @@ func (c Client)fetch(opt ...queryOption) *Spires{
 	return spireData
 }
 
+func countUp(s Spires){
+	total := TotalStreaks{}
+	for _, value := range s {
 
+		param := value.StopAt - value.StartAt
+
+		switch value.Type {
+		case "calm":
+			total.calm += param
+			break
+		case "focus":
+			total.focus += param
+			break
+		case "tense":
+			total.tense += param
+			break
+		case "activity":
+			total.activity += param
+			break
+		case "sedentary":
+			total.sedentary += param
+			break
+		}
+	}
+	fmt.Println(total)
+}
