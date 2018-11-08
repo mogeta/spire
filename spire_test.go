@@ -30,6 +30,10 @@ func Test(t *testing.T) {
 
 	accessToken := viper.GetString("access_token")
 	client := NewClient(accessToken)
-	spires := client.fetch(WithTime(time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)))
-	countUp(*spires)
+	spires,err := client.Fetch(WithTime(time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)))
+	if err != nil {
+		t.Fail()
+	}
+	summary := GetSummary(*spires)
+	fmt.Println(summary)
 }

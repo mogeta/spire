@@ -62,7 +62,7 @@ func WithTime(t time.Time) queryOption {
 	}
 }
 
-func (c Client)fetch(opt ...queryOption) *Spires{
+func (c Client)Fetch(opt ...queryOption) (*Spires,error){
 	query := Query{}
 	for _, o := range opt {
 		o(&query)
@@ -77,8 +77,7 @@ func (c Client)fetch(opt ...queryOption) *Spires{
 
 	resp, err := http.Get(URL + values.Encode())
 	if err != nil {
-		fmt.Println(err)
-
+		return nil,err
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
@@ -89,10 +88,10 @@ func (c Client)fetch(opt ...queryOption) *Spires{
 		fmt.Errorf("%s",err)
 	}
 
-	return spireData
+	return spireData,nil
 }
 
-func countUp(s Spires){
+func GetSummary(s Spires)TotalStreaks{
 	total := TotalStreaks{}
 	for _, value := range s {
 
@@ -116,5 +115,5 @@ func countUp(s Spires){
 			break
 		}
 	}
-	fmt.Println(total)
+	return total
 }
